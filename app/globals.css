@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   BASE
+========================= */
+@layer base {
+  :root {
+    --font-inter: 'Inter', sans-serif;
+    --font-cormorant: 'Cormorant Garamond', serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-noir text-creme;
+  }
+}
+
+/* =========================
+   COMPONENTS
+========================= */
+@layer components {
+  .btn-gold {
+    @apply bg-or text-noir px-6 py-3 text-xs uppercase tracking-widest font-medium
+           transition-all duration-300
+           hover:bg-or-pale
+           active:scale-95;
+  }
+
+  .btn-outline {
+    @apply border border-or text-or px-6 py-3 text-xs uppercase tracking-widest
+           transition-all duration-300
+           hover:bg-or hover:text-noir
+           active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply text-gris-clair text-xs uppercase tracking-widest
+           transition-colors duration-300
+           hover:text-or;
+  }
+
+  .card-product {
+    @apply bg-gris p-6 relative overflow-hidden cursor-pointer
+           transition-transform duration-300
+           hover:-translate-y-1;
+  }
+
+  .input-dark {
+    @apply w-full px-4 py-3 text-sm
+           bg-gris border border-white/10
+           text-creme placeholder:text-gris-clair
+           focus:outline-none focus:border-or/50
+           transition-colors duration-200;
+  }
+
+  .section-eyebrow {
+    @apply text-or text-xs uppercase tracking-[0.35em] mb-3;
+  }
+
+  .section-title {
+    @apply font-display text-blanc font-light leading-tight;
+  }
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a35;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 168, 76, 0.4);
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
