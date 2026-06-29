@@ -6,16 +6,68 @@ import { useCartStore } from '@/hooks/useCart'
 import { formatPrice } from '@/lib/utils'
 import { Minus, Plus, Trash2, MessageCircle, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCartStore()
   const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER || '6282247484376'
+  const supabase = createClient()
 
-  const orderViaWA = () => {
+  const [form, setForm] = useState({
+    shipping_name: '',
+    shipping_phone: '',
+    shipping_address: '',
+  })
+  const [loading, setLoading] = useState(false)
+
+  const orderViaWA = async () => {
+    if (!form.shipping_name || !form.shipping_phone || !form.shipping_address) {
+      toast.error('Lengkapi data pengiriman dulu!')
+      return
+    }
+
+    setLoading(true)
+
+    // Simpan order ke Supabase
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const orderItems = items.map((i) => ({
+      id: i.product.id,
+      name: i.product.name,
+      price: i.product.price,
+      quantity: i.quantity,
+      size_ml: i.product.size_ml,
+    }))
+
+    const { error } = await supabase.from('orders').insert({
+      user_id: user?.id || null,
+      user_email: user?.email || form.shipping_phone,
+      status: 'pending',
+      total: total(),
+      items: orderItems,
+      shipping_name: form.shipping_name,
+      shipping_phone: form.shipping_phone,
+      shipping_address: form.shipping_address,
+    })
+
+    if (error) {
+      console.error(error)
+      toast.error('Gagal menyimpan pesanan')
+      setLoading(false)
+      return
+    }
+
+    // Buka WA setelah order tersimpan
     const lines = items.map(
       (i) => `• ${i.product.name} (${i.product.size_ml}ml) x${i.quantity} = ${formatPrice(i.product.price * i.quantity)}`
     )
-    const msg = `Halo ParFivra! Saya ingin memesan:\n\n${lines.join('\n')}\n\n*Total: ${formatPrice(total())}*\n\nMohon konfirmasi ketersediaan dan detail pengiriman. Terima kasih!`
+    const msg = `Halo ParFivra! Saya ingin memesan:\n\n${lines.join('\n')}\n\n*Total: ${formatPrice(total())}*\n\nNama: ${form.shipping_name}\nNo HP: ${form.shipping_phone}\nAlamat: ${form.shipping_address}\n\nMohon konfirmasi. Terima kasih!`
+    
+    toast.success('Pesanan tersimpan!')
+    clearCart()
+    setLoading(false)
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
@@ -41,7 +93,6 @@ export default function CartPage() {
             <div className="md:col-span-2 space-y-4">
               {items.map((item) => (
                 <div key={item.id} className="flex gap-5 p-5 bg-gris">
-                  {/* Mini bottle */}
                   <div className="w-16 h-20 bg-noir flex items-center justify-center flex-shrink-0">
                     <svg viewBox="0 0 60 90" width="40" fill="none">
                       <rect x="23" y="6" width="14" height="4" rx="2" fill="#C9A84C" opacity="0.7" />
@@ -58,24 +109,15 @@ export default function CartPage() {
                   </div>
 
                   <div className="flex flex-col items-end justify-between">
-                    <button
-                      onClick={() => removeItem(item.product.id)}
-                      className="text-gris-clair hover:text-red-400 transition-colors"
-                    >
+                    <button onClick={() => removeItem(item.product.id)} className="text-gris-clair hover:text-red-400 transition-colors">
                       <Trash2 size={14} />
                     </button>
                     <div className="flex items-center gap-2 border border-or/20">
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        className="px-2 py-1 text-gris-clair hover:text-or transition-colors"
-                      >
+                      <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="px-2 py-1 text-gris-clair hover:text-or transition-colors">
                         <Minus size={12} />
                       </button>
                       <span className="text-sm w-6 text-center">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        className="px-2 py-1 text-gris-clair hover:text-or transition-colors"
-                      >
+                      <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="px-2 py-1 text-gris-clair hover:text-or transition-colors">
                         <Plus size={12} />
                       </button>
                     </div>
@@ -83,19 +125,16 @@ export default function CartPage() {
                 </div>
               ))}
 
-              <button
-                onClick={clearCart}
-                className="text-xs text-gris-clair hover:text-red-400 transition-colors tracking-widest uppercase mt-4"
-              >
+              <button onClick={clearCart} className="text-xs text-gris-clair hover:text-red-400 transition-colors tracking-widest uppercase mt-4">
                 Kosongkan Keranjang
               </button>
             </div>
 
             {/* Summary */}
-            <div className="bg-gris p-8 h-fit">
-              <h2 className="font-display text-xl text-blanc mb-6">Ringkasan Pesanan</h2>
+            <div className="bg-gris p-8 h-fit space-y-6">
+              <h2 className="font-display text-xl text-blanc">Ringkasan Pesanan</h2>
 
-              <div className="space-y-3 mb-6 border-b border-or/10 pb-6">
+              <div className="space-y-3 border-b border-or/10 pb-6">
                 {items.map((i) => (
                   <div key={i.id} className="flex justify-between text-sm">
                     <span className="text-gris-clair">{i.product.name} x{i.quantity}</span>
@@ -104,17 +143,44 @@ export default function CartPage() {
                 ))}
               </div>
 
-              <div className="flex justify-between items-center mb-8">
+              <div className="flex justify-between items-center">
                 <span className="text-sm tracking-widest uppercase text-gris-clair">Total</span>
                 <span className="font-display text-2xl text-or">{formatPrice(total())}</span>
               </div>
 
+              {/* Form pengiriman */}
+              <div className="space-y-3 border-t border-or/10 pt-6">
+                <p className="text-[10px] tracking-widest uppercase text-gris-clair">Data Pengiriman</p>
+                <input
+                  type="text"
+                  placeholder="Nama Lengkap"
+                  value={form.shipping_name}
+                  onChange={(e) => setForm({ ...form, shipping_name: e.target.value })}
+                  className="input-dark w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="No. WhatsApp"
+                  value={form.shipping_phone}
+                  onChange={(e) => setForm({ ...form, shipping_phone: e.target.value })}
+                  className="input-dark w-full"
+                />
+                <textarea
+                  placeholder="Alamat Lengkap"
+                  rows={3}
+                  value={form.shipping_address}
+                  onChange={(e) => setForm({ ...form, shipping_address: e.target.value })}
+                  className="input-dark w-full resize-none"
+                />
+              </div>
+
               <button
                 onClick={orderViaWA}
-                className="w-full flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 text-sm tracking-widest uppercase font-medium hover:bg-[#20bc5a] transition-colors mb-3"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 text-sm tracking-widest uppercase font-medium hover:bg-[#20bc5a] transition-colors disabled:opacity-50"
               >
                 <MessageCircle size={16} />
-                Pesan via WhatsApp
+                {loading ? 'Menyimpan...' : 'Pesan via WhatsApp'}
               </button>
 
               <p className="text-[10px] text-gris-clair text-center leading-relaxed">
