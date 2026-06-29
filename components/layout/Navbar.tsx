@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { ShoppingBag, Menu, X, User, LogOut } from 'lucide-react'
+import { ShoppingBag, Menu, X, LogOut } from 'lucide-react'
 import { useCartStore } from '@/hooks/useCart'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -17,10 +17,16 @@ export default function Navbar() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) setUser({ email: data.user.email ?? '' })
+      if (data.user) setUser({
+        email: data.user.email ?? '',
+        role: data.user.user_metadata?.role
+      })
     })
     const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ? { email: session.user.email ?? '' } : null)
+      setUser(session?.user ? {
+        email: session.user.email ?? '',
+        role: session.user.user_metadata?.role
+      } : null)
     })
     return () => listener.subscription.unsubscribe()
   }, [])
@@ -37,13 +43,9 @@ export default function Navbar() {
   }
 
   return (
-    <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-noir/95 backdrop-blur-md border-b border-or/10'
-          : 'bg-transparent'
-      }`}
-    >
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      scrolled ? 'bg-noir/95 backdrop-blur-md border-b border-or/10' : 'bg-transparent'
+    }`}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="font-display text-2xl font-light tracking-[0.3em] text-or uppercase">
@@ -58,10 +60,7 @@ export default function Navbar() {
             { label: 'Kontak', href: '/#contact' },
           ].map((l) => (
             <li key={l.href}>
-              <Link
-                href={l.href}
-                className="text-gris-clair text-xs tracking-[0.2em] uppercase hover:text-or transition-colors"
-              >
+              <Link href={l.href} className="text-gris-clair text-xs tracking-[0.2em] uppercase hover:text-or transition-colors">
                 {l.label}
               </Link>
             </li>
@@ -72,9 +71,12 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {user ? (
             <>
-              <Link href="/admin" className="hidden md:block text-xs text-gris-clair hover:text-or transition-colors tracking-widest uppercase">
-                Dashboard
-              </Link>
+              {/* Hanya tampil kalau admin */}
+              {user.role === 'admin' && (
+                <Link href="/admin" className="hidden md:block text-xs text-gris-clair hover:text-or transition-colors tracking-widest uppercase">
+                  Dashboard
+                </Link>
+              )}
               <button onClick={logout} className="hidden md:block text-gris-clair hover:text-or transition-colors">
                 <LogOut size={16} />
               </button>
@@ -94,10 +96,7 @@ export default function Navbar() {
             )}
           </Link>
 
-          <button
-            className="md:hidden text-creme"
-            onClick={() => setOpen(!open)}
-          >
+          <button className="md:hidden text-creme" onClick={() => setOpen(!open)}>
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -110,7 +109,9 @@ export default function Navbar() {
           <Link href="/shop/cart" className="text-sm tracking-widest uppercase text-gris-clair hover:text-or" onClick={() => setOpen(false)}>Keranjang ({count})</Link>
           {user ? (
             <>
-              <Link href="/admin" className="text-sm tracking-widest uppercase text-gris-clair hover:text-or" onClick={() => setOpen(false)}>Dashboard</Link>
+              {user.role === 'admin' && (
+                <Link href="/admin" className="text-sm tracking-widest uppercase text-gris-clair hover:text-or" onClick={() => setOpen(false)}>Dashboard</Link>
+              )}
               <button onClick={logout} className="text-left text-sm tracking-widest uppercase text-gris-clair hover:text-or">Keluar</button>
             </>
           ) : (

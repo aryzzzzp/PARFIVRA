@@ -12,17 +12,12 @@ export default async function AdminLayout({
 
   if (!user) redirect('/auth/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role !== 'admin') redirect('/')
+  // Cek dari user_metadata, bukan dari tabel profiles
+  const role = user.user_metadata?.role
+  if (role !== 'admin') redirect('/')
 
   return (
     <div className="min-h-screen bg-noir flex">
-      {/* Sidebar */}
       <aside className="w-56 bg-gris border-r border-or/10 flex flex-col">
         <div className="p-6 border-b border-or/10">
           <Link href="/" className="font-display text-xl tracking-[0.3em] text-or uppercase">
@@ -49,8 +44,6 @@ export default async function AdminLayout({
           <p className="text-[10px] text-gris-clair truncate">{user.email}</p>
         </div>
       </aside>
-
-      {/* Main */}
       <main className="flex-1 overflow-auto">
         <div className="p-8">{children}</div>
       </main>
