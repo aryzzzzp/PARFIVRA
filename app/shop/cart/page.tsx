@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
@@ -23,8 +23,13 @@ export default function CartPage() {
   const [loading, setLoading] = useState(false)
 
   const orderViaWA = async () => {
-    if (!form.shipping_name || !form.shipping_phone || !form.shipping_address) {
+    if (!form.shipping_name.trim() || !form.shipping_phone.trim() || !form.shipping_address.trim()) {
       toast.error('Lengkapi data pengiriman dulu!')
+      return
+    }
+
+    if (items.some((item) => item.product.stock <= 0 || item.quantity > item.product.stock)) {
+      toast.error('Ada produk yang stoknya sudah tidak mencukupi. Perbarui keranjang terlebih dahulu.')
       return
     }
 
@@ -33,42 +38,33 @@ export default function CartPage() {
     // Simpan order ke Supabase
     const { data: { user } } = await supabase.auth.getUser()
 
-    const orderItems = items.map((i) => ({
-      id: i.product.id,
-      name: i.product.name,
-      price: i.product.price,
-      quantity: i.quantity,
-      size_ml: i.product.size_ml,
-    }))
+    const orderItems = items.map((item) => ({ id: item.product.id, quantity: item.quantity }))
 
-    const { error } = await supabase.from('orders').insert({
-      user_id: user?.id || null,
-      user_email: user?.email || form.shipping_phone,
-      status: 'pending',
-      total: total(),
-      items: orderItems,
-      shipping_name: form.shipping_name,
-      shipping_phone: form.shipping_phone,
-      shipping_address: form.shipping_address,
+    const { error } = await supabase.rpc('place_order', {
+      p_items: orderItems,
+      p_user_email: user?.email || null,
+      p_shipping_name: form.shipping_name.trim(),
+      p_shipping_phone: form.shipping_phone.trim(),
+      p_shipping_address: form.shipping_address.trim(),
     })
 
     if (error) {
       console.error(error)
-      toast.error('Gagal menyimpan pesanan')
+      toast.error(`Gagal menyimpan pesanan: ${error.message}`)
       setLoading(false)
       return
     }
 
     // Buka WA setelah order tersimpan
     const lines = items.map(
-      (i) => `• ${i.product.name} (${i.product.size_ml}ml) x${i.quantity} = ${formatPrice(i.product.price * i.quantity)}`
+      (i) => `â€¢ ${i.product.name} (${i.product.size_ml}ml) x${i.quantity} = ${formatPrice(i.product.price * i.quantity)}`
     )
     const msg = `Halo ParFivra! Saya ingin memesan:\n\n${lines.join('\n')}\n\n*Total: ${formatPrice(total())}*\n\nNama: ${form.shipping_name}\nNo HP: ${form.shipping_phone}\nAlamat: ${form.shipping_address}\n\nMohon konfirmasi. Terima kasih!`
     
     toast.success('Pesanan tersimpan!')
     clearCart()
     setLoading(false)
-    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank')
+    window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`
   }
 
   return (
@@ -104,7 +100,7 @@ export default function CartPage() {
 
                   <div className="flex-1">
                     <h3 className="font-display text-lg text-blanc">{item.product.name}</h3>
-                    <p className="text-xs text-gris-clair mt-0.5">{item.product.accord} · {item.product.size_ml}ml</p>
+                    <p className="text-xs text-gris-clair mt-0.5">{item.product.accord} Â· {item.product.size_ml}ml</p>
                     <p className="text-or font-display mt-2">{formatPrice(item.product.price)}</p>
                   </div>
 
@@ -117,7 +113,7 @@ export default function CartPage() {
                         <Minus size={12} />
                       </button>
                       <span className="text-sm w-6 text-center">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="px-2 py-1 text-gris-clair hover:text-or transition-colors">
+                      <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} disabled={item.quantity >= item.product.stock} aria-label={`Tambah jumlah ${item.product.name}`} className="px-2 py-1 text-gris-clair hover:text-or transition-colors disabled:cursor-not-allowed disabled:opacity-30">
                         <Plus size={12} />
                       </button>
                     </div>
@@ -194,3 +190,5 @@ export default function CartPage() {
     </>
   )
 }
+
+

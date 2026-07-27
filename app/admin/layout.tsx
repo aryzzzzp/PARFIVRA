@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation'
+﻿import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import Link from 'next/link'
 
@@ -34,6 +34,7 @@ export default async function AdminLayout({
             { label: 'Dashboard', href: '/admin' },
             { label: 'Produk', href: '/admin/products' },
             { label: 'Pesanan', href: '/admin/orders' },
+            { label: 'Konten Situs', href: '/admin/content' },
           ].map((l) => (
             <Link
               key={l.href}
@@ -54,3 +55,4 @@ export default async function AdminLayout({
     </div>
   )
 }
+
