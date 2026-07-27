@@ -60,7 +60,9 @@ export default async function AdminDashboard() {
               {recentOrders.map((o) => (
                 <tr key={o.id} className="border-b border-or/5 hover:bg-or/5 transition-colors">
                   <td className="px-6 py-4 text-xs text-gris-clair font-mono">{o.id.slice(0, 8)}...</td>
-                  <td className="px-6 py-4 text-sm text-creme">{o.customer_name}</td>
+                  <td className="px-6 py-4 text-sm text-creme">
+                    {o.shipping_name || o.user_email || 'Tanpa nama'}
+                  </td>
                   <td className="px-6 py-4 text-sm text-or font-display">{formatPrice(o.total)}</td>
                   <td className="px-6 py-4">
                     <span className={`text-[10px] tracking-widest uppercase px-2 py-1 ${

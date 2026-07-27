@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { formatPrice } from '@/lib/utils'
 
@@ -28,18 +28,18 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([])
   const [selected, setSelected] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  const load = async () => {
+  const load = useCallback(async () => {
     const { data } = await supabase
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false })
     setOrders(data || [])
     setLoading(false)
-  }
+  }, [supabase])
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [load])
 
   const updateStatus = async (id: string, status: string) => {
     await supabase.from('orders').update({ status }).eq('id', id)

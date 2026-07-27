@@ -1,6 +1,7 @@
 'use client'
 
 import { ShoppingBag, MessageCircle } from 'lucide-react'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { Product } from '@/types'
 import { useCartStore } from '@/hooks/useCart'
@@ -30,9 +31,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
       <div className="w-full aspect-[3/4] bg-noir/50 mb-5 relative overflow-hidden">
         {productImage ? (
-          <img
+          <Image
             src={productImage}
             alt={product.name}
+            fill
+            unoptimized
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

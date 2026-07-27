@@ -12,9 +12,13 @@ export default async function AdminLayout({
 
   if (!user) redirect('/auth/login')
 
-  // Cek dari user_metadata, bukan dari tabel profiles
-  const role = user.user_metadata?.role
-  if (role !== 'admin') redirect('/')
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') redirect('/')
 
   return (
     <div className="min-h-screen bg-noir flex">

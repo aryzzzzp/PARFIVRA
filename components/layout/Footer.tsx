@@ -8,7 +8,6 @@ export default function Footer() {
   return (
     <footer className="border-t border-or/10 bg-noir">
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
-        {/* Brand */}
         <div className="md:col-span-2">
           <p className="font-display text-2xl tracking-[0.3em] text-or uppercase mb-4">ParFivra</p>
           <p className="text-sm text-gris-clair leading-relaxed max-w-xs">
@@ -25,14 +24,13 @@ export default function Footer() {
           </a>
         </div>
 
-        {/* Links */}
         <div>
           <h4 className="text-[10px] tracking-[0.3em] uppercase text-or mb-5">Koleksi</h4>
           <ul className="space-y-3 list-none">
-            {['Semua Parfum', 'Edisi Terbatas', 'Hadiah & Set', 'Miniatur'].map((l) => (
-              <li key={l}>
+            {['Semua Parfum', 'Edisi Terbatas', 'Hadiah & Set', 'Miniatur'].map((label) => (
+              <li key={label}>
                 <Link href="/shop/catalog" className="text-sm text-gris-clair hover:text-creme transition-colors">
-                  {l}
+                  {label}
                 </Link>
               </li>
             ))}
@@ -42,10 +40,10 @@ export default function Footer() {
         <div>
           <h4 className="text-[10px] tracking-[0.3em] uppercase text-or mb-5">Info</h4>
           <ul className="space-y-3 list-none">
-            {['Tentang Kami', 'Cara Pemesanan', 'Pengiriman', 'Kebijakan Retur'].map((l) => (
-              <li key={l}>
+            {['Tentang Kami', 'Cara Pemesanan', 'Pengiriman', 'Kebijakan Retur'].map((label) => (
+              <li key={label}>
                 <Link href="/" className="text-sm text-gris-clair hover:text-creme transition-colors">
-                  {l}
+                  {label}
                 </Link>
               </li>
             ))}
@@ -54,8 +52,8 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/5 px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-3">
-        <p className="text-xs text-gris-clair">© 2025 ParFivra Parfum. Seluruh hak cipta dilindungi.</p>
-        <p className="text-xs text-gris-clair">Dibuat dengan ♥ di Indonesia</p>
+        <p className="text-xs text-gris-clair">Copyright 2025 ParFivra Parfum. Seluruh hak cipta dilindungi.</p>
+        <p className="text-xs text-gris-clair">Dibuat dengan cinta di Indonesia</p>
       </div>
     </footer>
   )

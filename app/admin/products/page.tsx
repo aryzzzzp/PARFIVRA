@@ -1,13 +1,15 @@
-  'use client'
+'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { Product } from '@/types'
 import { formatPrice } from '@/lib/utils'
 import { Plus, Pencil, Trash2, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const EMPTY: Omit<Product, 'id' | 'created_at'> = {
+type ProductForm = Omit<Product, 'id' | 'created_at' | 'img'>
+
+const EMPTY: ProductForm = {
   name: '',
   description: '',
   price: 0,
@@ -23,41 +25,83 @@ export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([])
   const [modal, setModal] = useState(false)
   const [editing, setEditing] = useState<Product | null>(null)
-  const [form, setForm] = useState(EMPTY)
+  const [form, setForm] = useState<ProductForm>(EMPTY)
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  const load = async () => {
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
-    setProducts(data || [])
+  const load = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      toast.error(`Produk tidak dapat dimuat: ${error.message}`)
+      return
+    }
+
+    setProducts((data || []) as Product[])
+  }, [supabase])
+
+  useEffect(() => { load() }, [load])
+
+  const openNew = () => { setEditing(null); setForm({ ...EMPTY }); setModal(true) }
+  const openEdit = (p: Product) => {
+    setEditing(p)
+    setForm({
+      name: p.name ?? '', description: p.description ?? '', price: p.price ?? 0,
+      image_url: p.image_url ?? '', category: p.category ?? 'Floral', stock: p.stock ?? 0,
+      is_featured: p.is_featured ?? false, accord: p.accord ?? '', size_ml: p.size_ml ?? 50,
+    })
+    setModal(true)
   }
 
-  useEffect(() => { load() }, [])
-
-  const openNew = () => { setEditing(null); setForm(EMPTY); setModal(true) }
-  const openEdit = (p: Product) => { setEditing(p); setForm({ name: p.name, description: p.description, price: p.price, image_url: p.image_url, category: p.category, stock: p.stock, is_featured: p.is_featured, accord: p.accord, size_ml: p.size_ml }); setModal(true) }
-
   const save = async () => {
-    setLoading(true)
-    if (editing) {
-      const { error } = await supabase.from('products').update(form).eq('id', editing.id)
-      if (error) toast.error('Gagal memperbarui')
-      else toast.success('Produk diperbarui!')
-    } else {
-      const { error } = await supabase.from('products').insert(form)
-      if (error) toast.error('Gagal menambahkan')
-      else toast.success('Produk ditambahkan!')
+    const payload = {
+      ...form,
+      name: form.name.trim(),
+      description: form.description.trim() || null,
+      accord: form.accord.trim() || null,
+      image_url: form.image_url.trim() || null,
     }
-    setLoading(false)
-    setModal(false)
-    load()
+
+    if (!payload.name) return toast.error('Nama produk wajib diisi.')
+    if (!Number.isFinite(payload.price) || payload.price < 0) return toast.error('Harga harus berupa angka nol atau lebih.')
+    if (!Number.isInteger(payload.stock) || payload.stock < 0) return toast.error('Stok harus berupa bilangan bulat nol atau lebih.')
+    if (!Number.isInteger(payload.size_ml) || payload.size_ml <= 0) return toast.error('Ukuran harus berupa bilangan bulat lebih dari nol.')
+
+    setLoading(true)
+    try {
+      const { error } = editing
+        ? await supabase.from('products').update(payload).eq('id', editing.id)
+        : await supabase.from('products').insert(payload)
+
+      if (error) {
+        toast.error(`Gagal ${editing ? 'memperbarui' : 'menambahkan'} produk: ${error.message}`)
+        return
+      }
+
+      toast.success(editing ? 'Produk diperbarui!' : 'Produk ditambahkan!')
+      setModal(false)
+      await load()
+    } finally {
+      setLoading(false)
+    }
   }
 
   const del = async (id: string) => {
     if (!confirm('Hapus produk ini?')) return
-    await supabase.from('products').delete().eq('id', id)
+    setLoading(true)
+    const { error } = await supabase.from('products').delete().eq('id', id)
+    setLoading(false)
+
+    if (error) {
+      toast.error(`Gagal menghapus produk: ${error.message}`)
+      return
+    }
+
     toast.success('Produk dihapus')
-    load()
+    await load()
   }
 
   return (
@@ -83,7 +127,7 @@ export default function AdminProducts() {
           </thead>
           <tbody>
             {products.length === 0 ? (
-              <tr><td colSpan={7} className="px-6 py-16 text-center text-gris-clair text-sm">Belum ada produk. Klik "Tambah Produk" untuk mulai.</td></tr>
+              <tr><td colSpan={7} className="px-6 py-16 text-center text-gris-clair text-sm">Belum ada produk. Klik &quot;Tambah Produk&quot; untuk mulai.</td></tr>
             ) : products.map((p) => (
               <tr key={p.id} className="border-b border-or/5 hover:bg-or/5 transition-colors">
                 <td className="px-6 py-4 font-display text-blanc">{p.name}</td>
@@ -99,7 +143,7 @@ export default function AdminProducts() {
                 <td className="px-6 py-4">
                   <div className="flex gap-3">
                     <button onClick={() => openEdit(p)} className="text-gris-clair hover:text-or transition-colors"><Pencil size={14} /></button>
-                    <button onClick={() => del(p.id)} className="text-gris-clair hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
+                    <button onClick={() => del(p.id)} disabled={loading} aria-label={`Hapus ${p.name}`} className="text-gris-clair hover:text-red-400 transition-colors disabled:opacity-50"><Trash2 size={14} /></button>
                   </div>
                 </td>
               </tr>
@@ -125,7 +169,7 @@ export default function AdminProducts() {
               ].map((f) => (
                 <div key={f.key}>
                   <label className="text-[10px] tracking-widest uppercase text-gris-clair block mb-1.5">{f.label}</label>
-                  <input type={f.type} value={(form as any)[f.key]} onChange={(e) => setForm({ ...form, [f.key]: e.target.value })} className="input-dark" />
+                  <input type={f.type} value={form[f.key as keyof Pick<ProductForm, 'name' | 'accord' | 'image_url'>]} onChange={(e) => setForm({ ...form, [f.key]: e.target.value })} className="input-dark" />
                 </div>
               ))}
 

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter, Cormorant_Garamond } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
-import "./globals.css";
-// Definisi Font
-const inter = Inter({ 
-  subsets: ['latin'], 
-  variable: '--font-inter' 
+import './globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
 })
 
 const cormorant = Cormorant_Garamond({
@@ -16,7 +16,7 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Parfivra — Parfum Mewah',
+  title: 'Parfivra - Parfum Mewah',
   description: 'Koleksi parfum eksklusif pilihan maestro parfumeur Prancis.',
 }
 
@@ -27,9 +27,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${inter.variable} ${cormorant.variable}`}>
-      {/* Tambahkan class 'font-sans' dan 'font-serif' secara default di body 
-        agar utility Tailwind langsung mengenali font yang Anda buat.
-      */}
       <body className="bg-noir text-creme font-sans antialiased selection:bg-or selection:text-noir">
         <Toaster
           position="top-right"
