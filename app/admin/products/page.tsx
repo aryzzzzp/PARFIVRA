@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { Product } from '@/types'
 import { formatPrice } from '@/lib/utils'
-import { Plus, Pencil, Trash2, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Upload } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 type ProductForm = Omit<Product, 'id' | 'created_at' | 'img'>
@@ -27,6 +27,7 @@ export default function AdminProducts() {
   const [editing, setEditing] = useState<Product | null>(null)
   const [form, setForm] = useState<ProductForm>(EMPTY)
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const supabase = useMemo(() => createClient(), [])
 
   const load = useCallback(async () => {
@@ -54,6 +55,26 @@ export default function AdminProducts() {
       is_featured: p.is_featured ?? false, accord: p.accord ?? '', size_ml: p.size_ml ?? 50,
     })
     setModal(true)
+  }
+
+  const uploadImage = async (file: File | undefined) => {
+    if (!file) return
+    if (!file.type.startsWith('image/')) return toast.error('Pilih file gambar (JPG, PNG, WEBP, atau GIF).')
+    if (file.size > 5 * 1024 * 1024) return toast.error('Ukuran gambar maksimal 5 MB.')
+
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const path = `products/${crypto.randomUUID()}.${extension}`
+    setUploading(true)
+    const { error } = await supabase.storage.from('site-assets').upload(path, file, {
+      cacheControl: '3600',
+      contentType: file.type,
+    })
+    setUploading(false)
+    if (error) return toast.error(`Gagal mengunggah gambar: ${error.message}`)
+
+    const { data } = supabase.storage.from('site-assets').getPublicUrl(path)
+    setForm((current) => ({ ...current, image_url: data.publicUrl }))
+    toast.success('Gambar berhasil diunggah.')
   }
 
   const save = async () => {
@@ -92,16 +113,27 @@ export default function AdminProducts() {
   const del = async (id: string) => {
     if (!confirm('Hapus produk ini?')) return
     setLoading(true)
-    const { error } = await supabase.from('products').delete().eq('id', id)
-    setLoading(false)
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id)
+        .select('id')
 
-    if (error) {
-      toast.error(`Gagal menghapus produk: ${error.message}`)
-      return
+      if (error) {
+        toast.error(`Gagal menghapus produk: ${error.message}`)
+        return
+      }
+      if (!data?.length) {
+        toast.error('Produk tidak terhapus. Pastikan akun ini memiliki akses admin.')
+        return
+      }
+
+      setProducts((current) => current.filter((product) => product.id !== id))
+      toast.success('Produk dihapus')
+    } finally {
+      setLoading(false)
     }
-
-    toast.success('Produk dihapus')
-    await load()
   }
 
   return (
@@ -165,13 +197,23 @@ export default function AdminProducts() {
               {[
                 { label: 'Nama Produk', key: 'name', type: 'text' },
                 { label: 'Accord (mis: Rose · Jasmine)', key: 'accord', type: 'text' },
-                { label: 'URL Gambar', key: 'image_url', type: 'url' },
               ].map((f) => (
                 <div key={f.key}>
                   <label className="text-[10px] tracking-widest uppercase text-gris-clair block mb-1.5">{f.label}</label>
                   <input type={f.type} value={form[f.key as keyof Pick<ProductForm, 'name' | 'accord' | 'image_url'>]} onChange={(e) => setForm({ ...form, [f.key]: e.target.value })} className="input-dark" />
                 </div>
               ))}
+
+              <div>
+                <label className="text-[10px] tracking-widest uppercase text-gris-clair block mb-1.5">Gambar Produk</label>
+                <label className="flex cursor-pointer items-center justify-center gap-2 border border-dashed border-or/30 px-4 py-5 text-xs text-gris-clair transition-colors hover:border-or hover:text-or">
+                  <Upload size={16} />
+                  <span>{uploading ? 'Mengunggah gambar...' : 'Pilih gambar dari perangkat'}</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => uploadImage(event.target.files?.[0])} disabled={loading || uploading} className="sr-only" />
+                </label>
+                <p className="mt-1.5 text-xs text-gris-clair">JPG, PNG, WEBP, atau GIF hingga 5 MB.</p>
+                {form.image_url && <img src={form.image_url} alt="Pratinjau produk" className="mt-3 h-28 w-full object-cover" />}
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -208,8 +250,8 @@ export default function AdminProducts() {
               </label>
             </div>
 
-            <button onClick={save} disabled={loading} className="btn-gold w-full justify-center flex mt-6 disabled:opacity-50">
-              {loading ? 'Menyimpan...' : 'Simpan Produk'}
+            <button onClick={save} disabled={loading || uploading} className="btn-gold w-full justify-center flex mt-6 disabled:opacity-50">
+              {uploading ? 'Mengunggah...' : loading ? 'Menyimpan...' : 'Simpan Produk'}
             </button>
           </div>
         </div>
