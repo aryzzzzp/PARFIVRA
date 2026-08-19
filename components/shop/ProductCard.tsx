@@ -1,5 +1,6 @@
 ﻿'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { ShoppingBag, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
@@ -8,6 +9,8 @@ import { useCartStore } from '@/hooks/useCart'
 import { formatPrice } from '@/lib/utils'
 
 export default function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
+  const cardRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER || '6282247484376'
   const productImage = product.image_url || product.img
@@ -21,7 +24,22 @@ export default function ProductCard({ product, compact = false }: { product: Pro
   const waMessage = `Halo ParFivra, saya tertarik dengan *${product.name}* (${product.description || 'parfum pilihan'}) seharga ${formatPrice(product.price)}. Apakah masih tersedia?`
   const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`
 
-  return <article className={`card-product group relative ${compact ? 'p-4' : 'p-6'}`}>
+  useEffect(() => {
+    const card = cardRef.current
+    if (!card) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true)
+        observer.disconnect()
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -32px' })
+
+    observer.observe(card)
+    return () => observer.disconnect()
+  }, [])
+
+  return <article ref={cardRef} className={`card-product product-reveal group relative ${isVisible ? 'product-reveal-visible' : ''} ${compact ? 'p-4' : 'p-6'}`}>
     <div className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-or transition-transform duration-300 group-hover:scale-x-100" />
     <div className={`mb-3 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] ${product.is_featured ? 'text-or' : 'text-gris-clair'}`}><span>{product.is_featured ? '✦ Terlaris' : product.category}</span><span className={outOfStock ? 'text-red-400' : 'text-gris-clair'}>{outOfStock ? 'Habis' : `${product.stock} stok`}</span></div>
     <div className={`relative mb-4 w-full overflow-hidden bg-noir/50 ${compact ? 'aspect-square' : 'aspect-[3/4]'}`}>

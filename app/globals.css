@@ -56,6 +56,17 @@
            hover:-translate-y-1;
   }
 
+  .product-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 700ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .product-reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   .input-dark {
     @apply w-full px-4 py-3 text-sm
            bg-gris border border-white/10
@@ -102,6 +113,20 @@
   }
 
   to {
-    transform: translateX(-50%);
+    transform: translateX(-25%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .product-reveal,
+  .product-reveal-visible,
+  .card-product,
+  .card-product img {
+    transition: none !important;
+    transform: none !important;
   }
 }

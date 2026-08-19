@@ -6,7 +6,7 @@ export default function Footer() {
   const waLink = `https://wa.me/${waNumber}?text=Halo%20ParFivra,%20saya%20ingin%20bertanya%20tentang%20produk`
 
   return (
-    <footer className="border-t border-or/10 bg-noir">
+    <footer className="border-t border-or/30 bg-noir">
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="md:col-span-2">
           <p className="font-display text-2xl tracking-[0.3em] text-or uppercase mb-4">ParFivra</p>

@@ -1,6 +1,7 @@
 ﻿import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 export default async function AdminLayout({
   children,
@@ -46,6 +47,13 @@ export default async function AdminLayout({
           ))}
         </nav>
         <div className="p-4 border-t border-or/10">
+          <Link
+            href="/"
+            className="mb-4 flex items-center gap-2 px-4 py-2.5 text-xs tracking-widest uppercase text-or hover:bg-or/10 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Kembali ke Situs
+          </Link>
           <p className="text-[10px] text-gris-clair truncate">{user.email}</p>
         </div>
       </aside>
