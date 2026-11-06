@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { formatPrice } from '@/lib/utils'
-import { Package, ShoppingBag, Users, TrendingUp } from 'lucide-react'
+import { Package, ShoppingBag, Users } from 'lucide-react'
 
 export default async function AdminDashboard() {
   const supabase = await createServerSupabaseClient()
@@ -29,12 +29,7 @@ export default async function AdminDashboard() {
       <h1 className="font-display text-3xl text-blanc mb-2">Dashboard</h1>
       <p className="text-sm text-gris-clair mb-10">Selamat datang di panel admin ParFivra</p>
 
-      {/* Stats */}
-<<<<<<< HEAD
       <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
-=======
-      <div className="grid grid-cols-3 gap-6 mb-10">
->>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
         {stats.map((s) => (
           <div key={s.label} className="bg-gris p-6 border border-or/10">
             <div className="flex items-center justify-between mb-4">
@@ -46,56 +41,44 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* Recent orders */}
-<<<<<<< HEAD
       <div className="overflow-hidden border border-or/10 bg-gris">
-=======
-      <div className="bg-gris border border-or/10">
->>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
         <div className="p-6 border-b border-or/10">
           <h2 className="font-display text-xl text-blanc">Pesanan Terbaru</h2>
         </div>
         {recentOrders && recentOrders.length > 0 ? (
-<<<<<<< HEAD
           <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px]">
-=======
-          <table className="w-full">
->>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
-            <thead>
-              <tr className="border-b border-or/10">
-                {['ID', 'Pelanggan', 'Total', 'Status', 'Tanggal'].map((h) => (
-                  <th key={h} className="text-left px-6 py-3 text-[10px] tracking-widest uppercase text-gris-clair">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((o) => (
-                <tr key={o.id} className="border-b border-or/5 hover:bg-or/5 transition-colors">
-                  <td className="px-6 py-4 text-xs text-gris-clair font-mono">{o.id.slice(0, 8)}...</td>
-                  <td className="px-6 py-4 text-sm text-creme">
-                    {o.shipping_name || o.user_email || 'Tanpa nama'}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-or font-display">{formatPrice(o.total)}</td>
-                  <td className="px-6 py-4">
-                    <span className={`text-[10px] tracking-widest uppercase px-2 py-1 ${
-                      o.status === 'delivered' ? 'bg-green-900/30 text-green-400' :
-                      o.status === 'processing' ? 'bg-or/20 text-or' :
-                      o.status === 'cancelled' ? 'bg-red-900/30 text-red-400' :
-                      'bg-gris-clair/20 text-gris-clair'
-                    }`}>{o.status}</span>
-                  </td>
-                  <td className="px-6 py-4 text-xs text-gris-clair">
-                    {new Date(o.created_at).toLocaleDateString('id-ID')}
-                  </td>
+            <table className="w-full min-w-[640px]">
+              <thead>
+                <tr className="border-b border-or/10">
+                  {['ID', 'Pelanggan', 'Total', 'Status', 'Tanggal'].map((h) => (
+                    <th key={h} className="text-left px-6 py-3 text-[10px] tracking-widest uppercase text-gris-clair">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-<<<<<<< HEAD
+              </thead>
+              <tbody>
+                {recentOrders.map((o) => (
+                  <tr key={o.id} className="border-b border-or/5 hover:bg-or/5 transition-colors">
+                    <td className="px-6 py-4 text-xs text-gris-clair font-mono">{o.id.slice(0, 8)}...</td>
+                    <td className="px-6 py-4 text-sm text-creme">
+                      {o.shipping_name || o.user_email || 'Tanpa nama'}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-or font-display">{formatPrice(o.total)}</td>
+                    <td className="px-6 py-4">
+                      <span className={`text-[10px] tracking-widest uppercase px-2 py-1 ${
+                        o.status === 'delivered' ? 'bg-green-900/30 text-green-400' :
+                        o.status === 'processing' ? 'bg-or/20 text-or' :
+                        o.status === 'cancelled' ? 'bg-red-900/30 text-red-400' :
+                        'bg-gris-clair/20 text-gris-clair'
+                      }`}>{o.status}</span>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-gris-clair">
+                      {new Date(o.created_at).toLocaleDateString('id-ID')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-=======
->>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
         ) : (
           <div className="p-12 text-center text-gris-clair text-sm">Belum ada pesanan</div>
         )}

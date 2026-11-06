@@ -1,11 +1,7 @@
 ﻿import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import Link from 'next/link'
-<<<<<<< HEAD
 import { ArrowLeft, FileText, LayoutDashboard, Package, ShoppingBag, Users } from 'lucide-react'
-=======
-import { ArrowLeft } from 'lucide-react'
->>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 
 export default async function AdminLayout({
   children,
@@ -25,7 +21,6 @@ export default async function AdminLayout({
 
   if (profile?.role !== 'admin') redirect('/')
 
-<<<<<<< HEAD
   const links = [
     { label: 'Ringkasan', href: '/admin', icon: LayoutDashboard },
     { label: 'Produk', href: '/admin/products', icon: Package },
@@ -79,51 +74,7 @@ export default async function AdminLayout({
           </div>
         </header>
         <div className="p-4 sm:p-6 md:p-8">{children}</div>
-=======
-  return (
-    <div className="min-h-screen bg-noir flex">
-      <aside className="w-56 bg-gris border-r border-or/10 flex flex-col">
-        <div className="p-6 border-b border-or/10">
-          <Link href="/" className="font-display text-xl tracking-[0.3em] text-or uppercase">
-            ParFivra
-          </Link>
-          <p className="text-[10px] text-gris-clair mt-1 tracking-widest uppercase">Admin</p>
-        </div>
-        <nav className="flex-1 p-4 space-y-1">
-          {[
-            { label: 'Dashboard', href: '/admin' },
-            { label: 'Produk', href: '/admin/products' },
-            { label: 'Pesanan', href: '/admin/orders' },
-            { label: 'Konten Situs', href: '/admin/content' },
-          ].map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="block px-4 py-2.5 text-xs tracking-widest uppercase text-gris-clair hover:text-or hover:bg-or/5 transition-colors"
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="p-4 border-t border-or/10">
-          <Link
-            href="/"
-            className="mb-4 flex items-center gap-2 px-4 py-2.5 text-xs tracking-widest uppercase text-or hover:bg-or/10 transition-colors"
-          >
-            <ArrowLeft size={14} />
-            Kembali ke Situs
-          </Link>
-          <p className="text-[10px] text-gris-clair truncate">{user.email}</p>
-        </div>
-      </aside>
-      <main className="flex-1 overflow-auto">
-        <div className="p-8">{children}</div>
->>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
       </main>
     </div>
   )
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
