@@ -4,12 +4,19 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
 import { AboutContent, defaultAboutContent, defaultHomeContent, HomeContent } from '@/lib/site-content-defaults'
+<<<<<<< HEAD
 import { FileText, Globe2, ImagePlus, Save } from 'lucide-react'
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 
 type PageKey = 'home' | 'about'
 
 function Field({ label, value, onChange, multiline = false, hint }: { label: string; value: string; onChange: (value: string) => void; multiline?: boolean; hint?: string }) {
+<<<<<<< HEAD
   return <div><label className="mb-2 block text-xs font-medium text-[#555f70]">{label}</label>{multiline ? <textarea rows={5} value={value} onChange={(e) => onChange(e.target.value)} className="input-dark resize-y rounded-lg" /> : <input value={value} onChange={(e) => onChange(e.target.value)} className="input-dark rounded-lg" />}{hint && <p className="mt-2 text-xs text-[#8a92a0]">{hint}</p>}</div>
+=======
+  return <div><label className="mb-1.5 block text-[10px] uppercase tracking-widest text-gris-clair">{label}</label>{multiline ? <textarea rows={5} value={value} onChange={(e) => onChange(e.target.value)} className="input-dark resize-y" /> : <input value={value} onChange={(e) => onChange(e.target.value)} className="input-dark" />}{hint && <p className="mt-1.5 text-xs text-gris-clair">{hint}</p>}</div>
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 }
 
 export default function AdminContentPage() {
@@ -60,6 +67,7 @@ export default function AdminContentPage() {
     setAboutValue('imageUrl', data.publicUrl)
     toast.success('Gambar berhasil diunggah. Klik Simpan Tentang Kami untuk menerapkannya.')
   }
+<<<<<<< HEAD
   if (loading) return <div className="max-w-6xl animate-pulse space-y-5"><div className="h-8 w-56 rounded bg-[#e6e9ee]" /><div className="h-4 w-80 rounded bg-[#e6e9ee]" /><div className="h-72 rounded-xl bg-white" /></div>
 
   const sectionClass = 'overflow-hidden rounded-xl border border-[#e7e9ed] bg-white shadow-sm'
@@ -121,3 +129,13 @@ export default function AdminContentPage() {
     </section>
   </div>
 }
+=======
+  if (loading) return <p className="py-12 text-sm text-gris-clair">Memuat konten…</p>
+
+  return <div className="max-w-4xl"><h1 className="font-display text-3xl text-blanc">Konten Situs</h1><p className="mb-10 mt-1 text-sm text-gris-clair">Ubah teks dan gambar yang tampil pada Beranda serta Tentang Kami.</p>
+    <section className="mb-8 border border-or/10 bg-gris p-6 md:p-8"><h2 className="font-display text-2xl text-blanc">Beranda</h2><div className="mt-6 grid gap-5 md:grid-cols-2"><Field label="Label atas" value={home.eyebrow} onChange={(value) => setHomeValue('eyebrow', value)} /><Field label="Kata aksen" value={home.accent} onChange={(value) => setHomeValue('accent', value)} /><div className="md:col-span-2"><Field label="Judul utama" value={home.title} onChange={(value) => setHomeValue('title', value)} /></div><div className="md:col-span-2"><Field label="Deskripsi" value={home.description} onChange={(value) => setHomeValue('description', value)} multiline /></div><Field label="Label koleksi" value={home.featuredEyebrow} onChange={(value) => setHomeValue('featuredEyebrow', value)} /><Field label="Judul koleksi" value={home.featuredTitle} onChange={(value) => setHomeValue('featuredTitle', value)} /></div><button onClick={() => save('home', home)} disabled={saving !== null} className="btn-gold mt-7 disabled:opacity-50">{saving === 'home' ? 'Menyimpan…' : 'Simpan Beranda'}</button></section>
+    <section className="border border-or/10 bg-gris p-6 md:p-8"><h2 className="font-display text-2xl text-blanc">Tentang Kami</h2><div className="mt-6 grid gap-5"><Field label="Label atas" value={about.eyebrow} onChange={(value) => setAboutValue('eyebrow', value)} /><Field label="Judul utama" value={about.title} onChange={(value) => setAboutValue('title', value)} /><Field label="Isi cerita" value={about.paragraphs} onChange={(value) => setAboutValue('paragraphs', value)} multiline hint="Pisahkan paragraf dengan satu baris kosong." /><div><label className="mb-1.5 block text-[10px] uppercase tracking-widest text-gris-clair">Unggah gambar</label><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => uploadAboutImage(event.target.files?.[0])} disabled={uploading} className="block w-full text-sm text-gris-clair file:mr-4 file:border-0 file:bg-or file:px-4 file:py-2 file:text-xs file:font-medium file:uppercase file:tracking-widest file:text-noir hover:file:bg-or-pale disabled:opacity-50" /><p className="mt-1.5 text-xs text-gris-clair">JPG, PNG, WEBP, atau GIF hingga 5 MB. Setelah unggahan selesai, simpan perubahan di bawah.</p></div><Field label="URL gambar" value={about.imageUrl} onChange={(value) => setAboutValue('imageUrl', value)} hint="Terisi otomatis setelah unggah, atau masukkan URL gambar secara manual." /></div><button onClick={() => save('about', about)} disabled={saving !== null || uploading} className="btn-gold mt-7 disabled:opacity-50">{uploading ? 'Mengunggah…' : saving === 'about' ? 'Menyimpan…' : 'Simpan Tentang Kami'}</button></section>
+  </div>
+}
+
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9

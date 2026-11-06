@@ -4,12 +4,17 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useCartStore } from '@/hooks/useCart'
 import { formatPrice } from '@/lib/utils'
+<<<<<<< HEAD
 import { Minus, Plus, Trash2, MessageCircle, ShoppingBag, Landmark, QrCode } from 'lucide-react'
+=======
+import { Minus, Plus, Trash2, MessageCircle, ShoppingBag } from 'lucide-react'
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+<<<<<<< HEAD
 type PaymentMethod = 'bank_transfer' | 'qris' | 'whatsapp'
 
 const PAYMENT_METHODS: { id: PaymentMethod; label: string; detail: string; icon: typeof Landmark }[] = [
@@ -18,6 +23,8 @@ const PAYMENT_METHODS: { id: PaymentMethod; label: string; detail: string; icon:
   { id: 'whatsapp', label: 'Konfirmasi WhatsApp', detail: 'Diskusikan ketersediaan dan cara pembayaran langsung dengan admin.', icon: MessageCircle },
 ]
 
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCartStore()
   const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER || '6282247484376'
@@ -28,7 +35,10 @@ export default function CartPage() {
     shipping_phone: '',
     shipping_address: '',
   })
+<<<<<<< HEAD
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank_transfer')
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
   const [loading, setLoading] = useState(false)
 
   const orderViaWA = async () => {
@@ -49,7 +59,11 @@ export default function CartPage() {
 
     const orderItems = items.map((item) => ({ id: item.product.id, quantity: item.quantity }))
 
+<<<<<<< HEAD
     const { data: orderId, error } = await supabase.rpc('place_order', {
+=======
+    const { error } = await supabase.rpc('place_order', {
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
       p_items: orderItems,
       p_user_email: user?.email || null,
       p_shipping_name: form.shipping_name.trim(),
@@ -63,16 +77,20 @@ export default function CartPage() {
       setLoading(false)
       return
     }
+<<<<<<< HEAD
     if (!orderId) {
       toast.error('Pesanan belum dapat dikonfirmasi. Silakan coba kembali.')
       setLoading(false)
       return
     }
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 
     // Buka WA setelah order tersimpan
     const lines = items.map(
       (i) => `â€¢ ${i.product.name} (${i.product.size_ml}ml) x${i.quantity} = ${formatPrice(i.product.price * i.quantity)}`
     )
+<<<<<<< HEAD
     const paymentLabel = PAYMENT_METHODS.find((method) => method.id === paymentMethod)?.label || 'Transfer bank'
     const paymentInstructions = paymentMethod === 'bank_transfer'
       ? 'Mohon kirim detail rekening dan petunjuk transfer.'
@@ -80,6 +98,9 @@ export default function CartPage() {
         ? 'Mohon kirim QRIS atau instruksi pembayaran e-wallet.'
         : 'Mohon konfirmasi ketersediaan produk dan langkah selanjutnya.'
     const msg = `Halo ParFivra! Saya ingin mengonfirmasi pesanan *${orderId.slice(0, 8).toUpperCase()}*:\n\n${lines.join('\n')}\n\n*Total: ${formatPrice(total())}*\n*Metode pembayaran: ${paymentLabel}*\n\nNama: ${form.shipping_name}\nNo HP: ${form.shipping_phone}\nAlamat: ${form.shipping_address}\n\n${paymentInstructions}\nMohon konfirmasi. Terima kasih!`
+=======
+    const msg = `Halo ParFivra! Saya ingin memesan:\n\n${lines.join('\n')}\n\n*Total: ${formatPrice(total())}*\n\nNama: ${form.shipping_name}\nNo HP: ${form.shipping_phone}\nAlamat: ${form.shipping_address}\n\nMohon konfirmasi. Terima kasih!`
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
     
     toast.success('Pesanan tersimpan!')
     clearCart()
@@ -190,6 +211,7 @@ export default function CartPage() {
                 />
               </div>
 
+<<<<<<< HEAD
               <fieldset className="space-y-3 border-t border-or/10 pt-6">
                 <legend className="text-[10px] tracking-widest uppercase text-gris-clair">Metode pembayaran</legend>
                 <div className="space-y-2">
@@ -213,6 +235,8 @@ export default function CartPage() {
                 <p className="text-[10px] leading-4 text-gris-clair">Pembayaran dikonfirmasi manual oleh admin melalui WhatsApp. Tidak ada pembayaran otomatis yang diproses di situs ini.</p>
               </fieldset>
 
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
               <button
                 onClick={orderViaWA}
                 disabled={loading}
@@ -232,5 +256,11 @@ export default function CartPage() {
       <Footer />
     </>
   )
+<<<<<<< HEAD
 }
 
+=======
+}
+
+
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9

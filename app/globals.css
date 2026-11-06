@@ -82,6 +82,7 @@
   .section-title {
     @apply font-display text-blanc font-light leading-tight;
   }
+<<<<<<< HEAD
 
   .admin-shell .bg-gris {
     background-color: #ffffff;
@@ -131,6 +132,8 @@
   .admin-shell .hover\:text-or:hover {
     color: #8b6a24;
   }
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 }
 
 /* =========================

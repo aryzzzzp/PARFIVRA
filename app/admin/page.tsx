@@ -30,7 +30,11 @@ export default async function AdminDashboard() {
       <p className="text-sm text-gris-clair mb-10">Selamat datang di panel admin ParFivra</p>
 
       {/* Stats */}
+<<<<<<< HEAD
       <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+=======
+      <div className="grid grid-cols-3 gap-6 mb-10">
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
         {stats.map((s) => (
           <div key={s.label} className="bg-gris p-6 border border-or/10">
             <div className="flex items-center justify-between mb-4">
@@ -43,13 +47,21 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Recent orders */}
+<<<<<<< HEAD
       <div className="overflow-hidden border border-or/10 bg-gris">
+=======
+      <div className="bg-gris border border-or/10">
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
         <div className="p-6 border-b border-or/10">
           <h2 className="font-display text-xl text-blanc">Pesanan Terbaru</h2>
         </div>
         {recentOrders && recentOrders.length > 0 ? (
+<<<<<<< HEAD
           <div className="overflow-x-auto">
           <table className="w-full min-w-[640px]">
+=======
+          <table className="w-full">
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
             <thead>
               <tr className="border-b border-or/10">
                 {['ID', 'Pelanggan', 'Total', 'Status', 'Tanggal'].map((h) => (
@@ -80,7 +92,10 @@ export default async function AdminDashboard() {
               ))}
             </tbody>
           </table>
+<<<<<<< HEAD
           </div>
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
         ) : (
           <div className="p-12 text-center text-gris-clair text-sm">Belum ada pesanan</div>
         )}

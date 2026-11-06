@@ -3,7 +3,10 @@
 import { useCallback, useMemo, useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { formatPrice } from '@/lib/utils'
+<<<<<<< HEAD
 import toast from 'react-hot-toast'
+=======
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
 
 type Order = {
   id: string
@@ -32,6 +35,7 @@ export default function AdminOrders() {
   const supabase = useMemo(() => createClient(), [])
 
   const load = useCallback(async () => {
+<<<<<<< HEAD
     const { data, error } = await supabase
       .from('orders')
       .select('*')
@@ -41,6 +45,12 @@ export default function AdminOrders() {
       setLoading(false)
       return
     }
+=======
+    const { data } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
     setOrders(data || [])
     setLoading(false)
   }, [supabase])
@@ -48,12 +58,17 @@ export default function AdminOrders() {
   useEffect(() => { load() }, [load])
 
   const updateStatus = async (id: string, status: string) => {
+<<<<<<< HEAD
     const { error } = await supabase.from('orders').update({ status }).eq('id', id)
     if (error) {
       toast.error(`Status pesanan tidak dapat diperbarui: ${error.message}`)
       return
     }
     setOrders((current) => current.map((order) => order.id === id ? { ...order, status } : order))
+=======
+    await supabase.from('orders').update({ status }).eq('id', id)
+    load()
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
     if (selected?.id === id) setSelected({ ...selected, status })
   }
 
@@ -71,9 +86,15 @@ export default function AdminOrders() {
           <p className="text-gris-clair text-sm tracking-widest uppercase">Belum ada pesanan masuk</p>
         </div>
       ) : (
+<<<<<<< HEAD
         <div className="flex flex-col gap-5 lg:flex-row lg:gap-6">
           {/* List orders */}
           <div className="min-w-0 flex-1 overflow-x-auto border border-or/10 bg-gris">
+=======
+        <div className="flex gap-6">
+          {/* List orders */}
+          <div className="flex-1 bg-gris border border-or/10 overflow-x-auto">
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
             <table className="w-full">
               <thead>
                 <tr className="border-b border-or/10">
@@ -121,7 +142,11 @@ export default function AdminOrders() {
 
           {/* Detail order */}
           {selected && (
+<<<<<<< HEAD
             <div className="h-fit w-full border border-or/10 bg-gris p-6 lg:w-80">
+=======
+            <div className="w-80 bg-gris border border-or/10 p-6 h-fit">
+>>>>>>> 92f35dd30afc58fd023cebb491f1a4b50765c8e9
               <h2 className="font-display text-lg text-blanc mb-4">Detail Pesanan</h2>
               <div className="space-y-3 text-sm">
                 <div>
